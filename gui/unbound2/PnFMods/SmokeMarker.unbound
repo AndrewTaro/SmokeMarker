@@ -20,12 +20,10 @@
 		(macro TT_GET_PREF_NUMBER _varName="'blueScale'"	_pref="SM_PREFS.WORLD_BLUE")
 
 		(var colorTransform:dict = "{ redMultiplier: redScale, greenMultiplier: greenScale, blueMultiplier: blueScale, alphaMultiplier: alphaScale}")
-
-		(macro IS_SPECTATOR_MODE)
 	)
 
 	(controller $Repeat renderer='SM_WorldSmokeMarker'
-		(bind enabled "entityIdsCount > 0 && !isSpectatorTrainingMode")
+		(bind enabled "entityIdsCount > 0")
 		(bind count "entityIdsCount")
 		(args
 			_entityId="smokeMarkerEntityIds[$index]"
@@ -158,13 +156,11 @@
 		(macro TT_GET_PREF_NUMBER _varName="'redScale'" 	_pref="SM_PREFS.MAP_RED")
 		(macro TT_GET_PREF_NUMBER _varName="'greenScale'"	_pref="SM_PREFS.MAP_GREEN")
 		(macro TT_GET_PREF_NUMBER _varName="'blueScale'"	_pref="SM_PREFS.MAP_BLUE")
-
-		(macro IS_SPECTATOR_MODE)
 	)
 
 	(block
 		(controller $Repeat renderer='SM_MapSmokeMarker'
-			(bind enabled "entityIdsCount > 0 && !isSpectatorTrainingMode")
+			(bind enabled "entityIdsCount > 0")
 			(bind count "entityIdsCount")
 			(args
 				_entityId="smokeMarkerEntityIds[$index]"
