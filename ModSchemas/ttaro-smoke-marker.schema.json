@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 5,
+  "id": "cmtkswuwk0004v014sqo4uwid",
+  "author": "ttaro",
+  "modName": "Smoke Marker",
+  "slug": "smoke-marker",
+  "order": 4,
+  "tree": [
+    {
+      "kind": "group",
+      "key": "cmtktama200alv0d47jl3l3wm",
+      "display": "section",
+      "label": "IDS_TT_APPEARANCE",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "color",
+          "key": "smokeMarker.color.minimap",
+          "label": "IDS_TT_SMOKEMARKER_COLOR_MINIMAP",
+          "default": 1724697804,
+          "min": 0,
+          "max": 4294967295
+        },
+        {
+          "kind": "setting",
+          "control": "color",
+          "key": "smokeMarker.color.world",
+          "label": "IDS_TT_SMOKEMARKER_COLOR_WORLD",
+          "default": 4294967295,
+          "min": 0,
+          "max": 4294967295
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 5,
+  "opVocabularyVersion": 3,
+  "slug": "smoke-marker",
+  "migrations": [
+    {
+      "version": 1,
+      "description": "legacy values decoded and folded onto the derived keys",
+      "ops": [
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "smokeMarker.color.minimap",
+          "sources": [
+            {
+              "key": "smokeMarkerMinimapOpacity",
+              "default": 4
+            },
+            {
+              "key": "smokeMarkerMinimapRed",
+              "default": 8
+            },
+            {
+              "key": "smokeMarkerMinimapGreen",
+              "default": 8
+            },
+            {
+              "key": "smokeMarkerMinimapBlue",
+              "default": 8
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              },
+              {
+                "present": 1
+              },
+              {
+                "present": 2
+              },
+              {
+                "present": 3
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 1
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "g": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 2
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "b": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 3
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              }
+            }
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "smokeMarker.color.world",
+          "sources": [
+            {
+              "key": "smokeMarkerWorldOpacity",
+              "default": 10
+            },
+            {
+              "key": "smokeMarkerWorldRed",
+              "default": 10
+            },
+            {
+              "key": "smokeMarkerWorldGreen",
+              "default": 10
+            },
+            {
+              "key": "smokeMarkerWorldBlue",
+              "default": 10
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              },
+              {
+                "present": 1
+              },
+              {
+                "present": 2
+              },
+              {
+                "present": 3
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 1
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "g": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 2
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "b": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 3
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

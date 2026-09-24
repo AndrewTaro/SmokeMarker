@@ -1,23 +1,18 @@
-(def constant TT_SMOKEMARKER_INSTALLED true) #for modconfig
+(def constant SM_COMPONENT_KEY_LIST 'modSmokeMarkerEntityList')
 
-######################################################
-#### WORLD MARKERS ###################################
-######################################################
 (def element SM_WorldSmokeMarkersContainer() layout=true
 	(scope
-		(var parameterCol:gfx = "$datahub.getCollection(CC.parameter)")
-		(var smokeMarkersContainerEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.parameter, 0, 'modSmokeMarkerEntityList')" (event "parameterCol.evAdded") (event "parameterCol.evRemoved"))
-		(var dataComponent:gfx = "smokeMarkersContainerEntity ? smokeMarkersContainerEntity.data : null")
-		(var smokeMarkerEntityIds:array = "dataComponent ? dataComponent.data.ids : []" (event "dataComponent.evChanged"))
+		(var listWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, SM_COMPONENT_KEY_LIST)")
+		(var listEntity:gfx = "listWatcher.entity" (event "listWatcher.event"))
+		(var listComponent:gfx = "listEntity ? listEntity.mods_DataComponent : null")
+		(var smokeMarkerEntityIds:array = "listComponent ? listComponent.data.ids : []" (event "listComponent.evDataChanged"))
 		(var entityIdsCount:number = "smokeMarkerEntityIds ? smokeMarkerEntityIds.length : 0")
 
-		#Userprefs
-		(macro TT_GET_USERPREF)
-
-		(macro TT_GET_PREF_NUMBER _varName="'alphaScale'"	_pref="SM_PREFS.WORLD_ALPHA")
-		(macro TT_GET_PREF_NUMBER _varName="'redScale'" 	_pref="SM_PREFS.WORLD_RED")
-		(macro TT_GET_PREF_NUMBER _varName="'greenScale'"	_pref="SM_PREFS.WORLD_GREEN")
-		(macro TT_GET_PREF_NUMBER _varName="'blueScale'"	_pref="SM_PREFS.WORLD_BLUE")
+		(macro TT_GET_PREF _varName="'worldColorPref'" _key="'ttaro.smokeMarker.color.world'")
+		(var alphaScale:number = "null != worldColorPref && null != worldColorPref.a ? worldColorPref.a : 1")
+		(var redScale:number   = "null != worldColorPref && null != worldColorPref.r ? worldColorPref.r : 1")
+		(var greenScale:number = "null != worldColorPref && null != worldColorPref.g ? worldColorPref.g : 1")
+		(var blueScale:number  = "null != worldColorPref && null != worldColorPref.b ? worldColorPref.b : 1")
 
 		(var colorTransform:dict = "{ redMultiplier: redScale, greenMultiplier: greenScale, blueMultiplier: blueScale, alphaMultiplier: alphaScale}")
 	)
@@ -37,16 +32,14 @@
 	(scope
 		(event evMarkerShow)
 
-		#Smoke Timers Entity
 		(var _markerEntity:gfx = "$datahub.getEntity(_entityId)")
 
-		(macro GET_MARKER_ENTITY_COMPONENT 'data')
+		(var dataComponent:gfx = "_markerEntity && _markerEntity.hasComponent(CC.mods_DataComponent) ? _markerEntity.mods_DataComponent : null" (event "_markerEntity.evAdded") (event "_markerEntity.evRemoved"))
 		(macro GET_MARKER_ENTITY_COMPONENT 'screenPosition')
 		(macro GET_MARKER_ENTITY_COMPONENT 'worldMarker')
 		(macro GET_MARKER_ENTITY_COMPONENT 'distance')
 
 		(var createdTime:number = "dataComponent ? dataComponent.data.spawnTime : -1")
-		# Camera
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera.altVision" (event "camera.evAltVisionChanged"))
 		(var isBinocular:bool = "camera.isBinocular" (event "camera.evIsBinocularChanged"))
@@ -54,12 +47,10 @@
 
 		(var markerAlpha:number = "isBinocular ? 0.7 : 1.0")
 
-		# Distance
 		(var distanceIndex:number = "distanceComponent ? distanceComponent.distanceIndex : -1" (event "distanceComponent.evDistanceIndexChanged"))
 		(var closeToCamera:bool = "distanceIndex == DistanceType.NEAR")
 		(var isDistanceVisible:bool = "altVision && !isTactical")
 
-		# Timers
 		(macro IS_SPECTATOR_MODE)
 		(var isTimerValid:bool = "createdTime > 0")
 		(var isTimerVisible:bool = "(altVision || (isSpectatorTrainingMode && closeToCamera)) && !isTactical && isTimerValid")
@@ -67,7 +58,6 @@
 		(var timeElapsed:number = "timer.currentTime - createdTime" (event "timer.evInfrequent"))
 		(macro HUMAN_READABLE_COUNTDOWN_SCOPE "timeElapsed")
 
-		# Screen Pos
 		(var posX:number = "screenPositionComponent ? screenPositionComponent.position.x : 0" (event "evEnterFrame"))
 		(var posY:number = "screenPositionComponent ? screenPositionComponent.position.y : 0" (event "evEnterFrame"))
 		(var posZ:number = "worldMarkerComponent ? worldMarkerComponent.zindex : 0" (event "worldMarkerComponent.evZindexChanged"))
@@ -94,8 +84,6 @@
 			(bind alpha "isDistanceVisible ? 1 : 0")
 		)
 		(block
-			# To avoid conflict between alpha animation and colortransform
-			# Simply moving the animation outside doesn't work with marginBottom
 			(block
 				(style
 					(bind backgroundImage "'url:../quick_commands/qc_icon_smoke.png'")
@@ -119,9 +107,6 @@
 	)
 )
 
-######################################################
-#### MINIMAP MARKERS #################################
-######################################################
 (def element MinimapMarkersContainer (_mapScale:number, _itemScale:number, _scaleRatio:number, _markerSettingsMap:array, _isLoading:bool = false) layout=true
 	(scope
 		(var markersCollection:gfx = "$datahub.getCollection(CC.minimapMarker)")
@@ -130,9 +115,7 @@
 
 	(class $FullsizeAbsolute)
 
-	#mod
 	(element SM_MapSmokeMarkersContainer "_mapScale" "_itemScale" "_scaleRatio")
-	#mod
 
 	(controller $Repeat renderer='MapMarkerItem'
 		(bind count "availableMarkers.items.length" watch=false (event "availableMarkers.evAdded"))
@@ -143,19 +126,17 @@
 
 (def element SM_MapSmokeMarkersContainer (_mapScale:number, _itemScale:number, _scaleRatio:number) layout=true
 	(scope
-		(var parameterCol:gfx = "$datahub.getCollection(CC.parameter)")
-		(var smokeMarkersContainerEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.parameter, 0, 'modSmokeMarkerEntityList')" (event "parameterCol.evAdded") (event "parameterCol.evRemoved"))
-		(var dataComponent:gfx = "smokeMarkersContainerEntity ? smokeMarkersContainerEntity.data : null")
-		(var smokeMarkerEntityIds:array = "dataComponent ? dataComponent.data.ids : []" (event "dataComponent.evChanged"))
+		(var listWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, SM_COMPONENT_KEY_LIST)")
+		(var listEntity:gfx = "listWatcher.entity" (event "listWatcher.event"))
+		(var listComponent:gfx = "listEntity ? listEntity.mods_DataComponent : null")
+		(var smokeMarkerEntityIds:array = "listComponent ? listComponent.data.ids : []" (event "listComponent.evDataChanged"))
 		(var entityIdsCount:number = "smokeMarkerEntityIds ? smokeMarkerEntityIds.length : 0")
 
-		#UserPrefs
-		(macro TT_GET_USERPREF)
-		
-		(macro TT_GET_PREF_NUMBER _varName="'alphaScale'"	_pref="SM_PREFS.MAP_ALPHA")
-		(macro TT_GET_PREF_NUMBER _varName="'redScale'" 	_pref="SM_PREFS.MAP_RED")
-		(macro TT_GET_PREF_NUMBER _varName="'greenScale'"	_pref="SM_PREFS.MAP_GREEN")
-		(macro TT_GET_PREF_NUMBER _varName="'blueScale'"	_pref="SM_PREFS.MAP_BLUE")
+		(macro TT_GET_PREF _varName="'mapColorPref'" _key="'ttaro.smokeMarker.color.minimap'")
+		(var alphaScale:number = "null != mapColorPref && null != mapColorPref.a ? mapColorPref.a : 0.4")
+		(var redScale:number   = "null != mapColorPref && null != mapColorPref.r ? mapColorPref.r : 0.8")
+		(var greenScale:number = "null != mapColorPref && null != mapColorPref.g ? mapColorPref.g : 0.8")
+		(var blueScale:number  = "null != mapColorPref && null != mapColorPref.b ? mapColorPref.b : 0.8")
 	)
 
 	(block
@@ -178,15 +159,12 @@
 (def element SM_MapSmokeMarker (_entityId:number, _mapScale:number, _itemScale:number, _scaleRatio:number) layout=true
 	(scope
 		(event evMarkerShow)
-		#Smoke Timers Entity
 		(var smokeMarkerEntity:gfx = "$datahub.getEntity(_entityId)")
 		(var mapPosition:gfx = "smokeMarkerEntity.mapPosition")
-		#Marker Scale
 		(var markerScale:number = "_itemScale / _mapScale")
-		(var radius:number = "smokeMarkerEntity.data.data.radius * _scaleRatio")
-		#Map Pos
-		(var posX:number = "mapPosition ? _scaleRatio * mapPosition.position.x : 0")# (event "evEnterFrame"))
-		(var posY:number = "mapPosition ? _scaleRatio * mapPosition.position.y : 0")# (event "evEnterFrame"))
+		(var radius:number = "smokeMarkerEntity.mods_DataComponent.data.radius * _scaleRatio")
+		(var posX:number = "mapPosition ? _scaleRatio * mapPosition.position.x : 0")
+		(var posY:number = "mapPosition ? _scaleRatio * mapPosition.position.y : 0")
 	)
 
 	(dispatch evMarkerShow args="{}" on='addedToStage')
@@ -199,9 +177,6 @@
 		(position = "absolute")
 	)
 
-	#For some really weird reason, a circle does not appear when there is only one instance within the parent repeat.
-	#This animation somehow solves that issue, but not sure why it happens in the first place.
-	#Disabling blendMode=layer solves the problem, so I assume this is a bug on the framework/AS3 side than this mod itself.
 
 
 	(block

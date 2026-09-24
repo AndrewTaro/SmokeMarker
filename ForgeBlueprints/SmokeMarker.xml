@@ -1,0 +1,10 @@
+<mod name="SmokeMarker" version="1.4.0" priority="0">
+  <requires installer="&gt;=1.0.0"/>
+
+  <!-- Unbound 2 view; the .unbound file is auto-discovered, only the battle mount is needed. -->
+  <ubMountInBattle unbound="2"
+                   rootElementId="SM_WorldSmokeMarkersContainer"
+                   name="unbound2WorldSmokeMarkersContainer"
+                   hitTest="false"
+                   before="MarkersContainer"/>
+</mod>
