@@ -5,6 +5,7 @@
   "modName": "Smoke Marker",
   "slug": "smoke-marker",
   "order": 4,
+  "migrationVersion": 1,
   "tree": [
     {
       "kind": "group",
